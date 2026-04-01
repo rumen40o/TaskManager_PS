@@ -1,0 +1,23 @@
+﻿<Window x:Class="TaskManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Login"
+        Height="300"
+        Width="350"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock Text="Login" FontSize="24" Margin="0,0,0,20"/>
+
+            <TextBlock Text="Username"/>
+            <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Password"/>
+            <PasswordBox x:Name="PasswordBox" Margin="0,5,0,15"/>
+
+            <Button Content="Login" Command="{Binding LoginCommand}" Height="30" Margin="0,0,0,10"/>
+            <Button Content="Go to Register" Command="{Binding OpenRegisterCommand}" Height="30"/>
+        </StackPanel>
+    </Grid>
+</Window>
