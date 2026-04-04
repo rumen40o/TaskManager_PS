@@ -3,53 +3,129 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Name="UserDashboardWindow"
         Title="User Dashboard"
-        Height="500"
-        Width="800"
+        Height="600"
+        Width="1100"
         WindowStartupLocation="CenterScreen">
 
     <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <DataGrid ItemsSource="{Binding Tasks}"
-                  SelectedItem="{Binding SelectedTask}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  Margin="0,0,0,15">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="150"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
-                <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" Width="120"/>
-                <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="100"/>
+        <!-- LEFT SIDE -->
+        <Grid Grid.Column="0" Margin="0,0,15,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-                <DataGridTemplateColumn Header="Status" Width="150">
-    <DataGridTemplateColumn.CellTemplate>
-        <DataTemplate>
-            <TextBlock Text="{Binding SelectedStatus}" />
-        </DataTemplate>
-    </DataGridTemplateColumn.CellTemplate>
+            <!-- SEARCH -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Search:"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"/>
+                <TextBox Width="250"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
 
-    <DataGridTemplateColumn.CellEditingTemplate>
-        <DataTemplate>
-            <ComboBox ItemsSource="{Binding DataContext.Statuses, ElementName=UserDashboardWindow}"
-                      SelectedItem="{Binding SelectedStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </DataTemplate>
-    </DataGridTemplateColumn.CellEditingTemplate>
-</DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+            <!-- TASK TABLE -->
+            <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding Tasks}"
+                      SelectedItem="{Binding SelectedTask}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      Margin="0,0,0,15">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="150"/>
+                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="220"/>
+                    <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" Width="120"/>
+                    <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="100"/>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Refresh"
-                    Command="{Binding RefreshTasksCommand}"
-                    Width="100"
-                    Margin="0,0,10,0"/>
+                    <DataGridTemplateColumn Header="Status" Width="150">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SelectedStatus}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
 
-            <Button Content="Update Status"
-                    Command="{Binding UpdateStatusCommand}"
-                    Width="120"/>
-        </StackPanel>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding DataContext.Statuses, ElementName=UserDashboardWindow}"
+                                          SelectedItem="{Binding SelectedStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- ACTION BUTTONS -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Refresh"
+                        Command="{Binding RefreshTasksCommand}"
+                        Width="100"
+                        Margin="0,0,10,0"/>
+
+                <Button Content="Update Status"
+                        Command="{Binding UpdateStatusCommand}"
+                        Width="120"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- RIGHT SIDE COMMENTS -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="Comments"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <ListBox Grid.Row="1"
+                     ItemsSource="{Binding Comments}"
+                     Margin="0,0,0,10">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray"
+                                BorderThickness="1"
+                                Padding="8"
+                                Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Username}"
+                                           FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Content}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,4,0,4"/>
+                                <TextBlock Text="{Binding CreatedAt}"
+                                           FontSize="10"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Grid.Row="2"
+                       Text="New Comment"
+                       Margin="0,0,0,5"/>
+
+            <StackPanel Grid.Row="3">
+                <TextBox Text="{Binding NewComment, UpdateSourceTrigger=PropertyChanged}"
+                         Height="90"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,10"/>
+
+                <Button Content="Add Comment"
+                        Command="{Binding AddCommentCommand}"
+                        Height="35"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

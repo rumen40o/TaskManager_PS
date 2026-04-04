@@ -23,7 +23,7 @@ namespace TaskManager.View
         public AdminDashboard()
         {
             InitializeComponent();
-            DataContext = new AdminViewModel();
+            DataContext = new AdminDashboardViewModel();
         }
     }
 }
