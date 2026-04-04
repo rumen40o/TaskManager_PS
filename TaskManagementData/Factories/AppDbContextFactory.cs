@@ -11,14 +11,14 @@ namespace TaskManagementData.Factories
 {
     public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
-        //public AppDbContext CreateDbContext(string[] args)
-        //{
-        //    var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+        public AppDbContext CreateDbContextSQLite(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
-        //    optionsBuilder.UseSqlite("Data Source=taskmanager.db");
+            optionsBuilder.UseSqlite("Data Source=taskmanager.db");
 
-        //    return new AppDbContext(optionsBuilder.Options);
-        //}
+            return new AppDbContext(optionsBuilder.Options);
+        }
 
         public AppDbContext CreateDbContext(string[] args)
         {

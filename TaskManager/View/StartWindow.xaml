@@ -1,0 +1,45 @@
+﻿<Window x:Class="TaskManager.View.StartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Start"
+        Height="250"
+        Width="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Select Database Provider"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"/>
+
+        <TextBlock Grid.Row="1"
+                   Text="Database:"
+                   Margin="0,0,0,5"/>
+
+        <ComboBox x:Name="DatabaseProviderComboBox"
+                  Grid.Row="2"
+                  SelectedIndex="0"
+                  Height="30">
+            <ComboBoxItem Content="PostgreSql"/>
+            <ComboBoxItem Content="SQLite"/>
+        </ComboBox>
+
+        <Button Grid.Row="3"
+                Content="Continue"
+                Height="35"
+                Width="120"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,20,0,0"
+                Click="ContinueButton_Click"/>
+    </Grid>
+</Window>

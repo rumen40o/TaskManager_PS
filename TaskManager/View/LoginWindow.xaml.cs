@@ -10,16 +10,16 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TaskManager.ViewModel;
 
-namespace TaskManager
+namespace TaskManager.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class LoginWindow : Window
     {
         private readonly LoginViewModel _viewModel;
 
-        public MainWindow()
+        public LoginWindow()
         {
             InitializeComponent();
 

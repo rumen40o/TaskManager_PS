@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManagementData.Contexts;
+using TaskManagemetCore.DTOs;
 using TaskManagemetCore.Interfaces;
 using TaskManagemetCore.Models;
 
@@ -39,6 +40,49 @@ namespace TaskManagementData.Repositories
                 .Include(t => t.Category)
                 .Include(t => t.CreatedByUser)
                 .ToList();
+        }
+
+        public void Delete(TaskItem task)
+        {
+            _context.Tasks.Remove(task);
+        }
+
+        public void Update(TaskItem task)
+        {
+            _context.Tasks.Update(task);
+        }
+
+        public List<TaskDashboardDto> GetAllForDashboard()
+        {
+            var tasks = _context.Tasks
+                .Include(t => t.Category)
+                .ToList();
+
+            var assignments = _context.TaskAssignments
+                .ToList();
+
+            var result = tasks.Select(t =>
+            {
+                var statuses = assignments
+                    .Where(a => a.TaskId == t.Id)
+                    .Select(a => a.Status.ToString())
+                    .Distinct()
+                    .ToList();
+
+                return new TaskDashboardDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description ?? string.Empty,
+                    Priority = t.Priority,
+                    CategoryName = t.Category != null ? t.Category.Name : "No Category",
+                    Status = statuses.Count == 0
+                        ? "No status"
+                        : string.Join(", ", statuses)
+                };
+            }).ToList();
+
+            return result;
         }
     }
 }

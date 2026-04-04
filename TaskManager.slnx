@@ -2,4 +2,5 @@
   <Project Path="TaskManagementData/TaskManagementData.csproj" />
   <Project Path="TaskManagemetCore/TaskManagemetCore.csproj" />
   <Project Path="TaskManager/TaskManager.csproj" />
+  <Project Path="TaskManagerWinForms/TaskManagerWinForms.csproj" Id="31259f23-ba71-4a34-bbc7-6a11f18ac92e" />
 </Solution>

@@ -30,7 +30,12 @@ namespace TaskManagementData.Factories
                     throw new Exception("Unsupported database");
             }
 
-            return new AppDbContext(builder.Options);
+            var context = new AppDbContext(builder.Options);
+            context.Database.EnsureCreated();
+
+            DbSeeder.Seed(context);
+            return context;
+
         }
     }
 }

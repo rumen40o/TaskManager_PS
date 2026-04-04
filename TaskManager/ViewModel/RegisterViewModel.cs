@@ -64,7 +64,7 @@ namespace TaskManager.ViewModel
 
         private void Register()
         {
-            using var context = DbContextFactory.Create(DatabaseProvider.PostgreSql);
+            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
             var userRepository = new UserRepository(context);
             var authService = new AuthService(userRepository);
 
@@ -85,7 +85,7 @@ namespace TaskManager.ViewModel
 
         private void BackToLogin()
         {
-            var loginWindow = new MainWindow();
+            var loginWindow = new LoginWindow();
             loginWindow.Show();
 
             foreach (Window window in Application.Current.Windows)

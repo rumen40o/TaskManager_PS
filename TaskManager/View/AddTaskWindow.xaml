@@ -1,0 +1,71 @@
+﻿<Window x:Class="TaskManager.View.AddTaskWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Admin Dashboard"
+        Height="600"
+        Width="500"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="20">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <TextBlock Text="Admin Dashboard"
+                           FontSize="24"
+                           Margin="0,0,0,20"/>
+
+                <TextBlock Text="Add Category"
+                           FontSize="16"
+                           Margin="0,0,0,5"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                    <TextBox Width="250"
+                             Text="{Binding NewCategoryName, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,10,0"/>
+                    <Button Content="Add Category"
+                            Command="{Binding AddCategoryCommand}"
+                            Width="120"/>
+                </StackPanel>
+
+                <TextBlock Text="Title"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,5,0,10"/>
+
+                <TextBlock Text="Description"/>
+                <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,5,0,10"
+                         Height="80"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"/>
+
+                <TextBlock Text="Category"/>
+                <ComboBox ItemsSource="{Binding Categories}"
+                          SelectedItem="{Binding SelectedCategory}"
+                          DisplayMemberPath="Name"
+                          Margin="0,5,0,15"/>
+
+                <TextBlock Text="Priority"/>
+                <ComboBox ItemsSource="{Binding Priorities}"
+          SelectedItem="{Binding SelectedPriority}"
+          Margin="0,5,0,15"/>
+
+
+                <TextBlock Text="Assign Users"/>
+                <ItemsControl ItemsSource="{Binding Users}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding Username}"
+                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      Margin="0,3,0,3"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button Content="Create Task"
+                        Command="{Binding CreateTaskCommand}"
+                        Height="35"
+                        Margin="0,20,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

@@ -71,7 +71,7 @@ namespace TaskManager.ViewModel
 
         private void LoadData()
         {
-            using var context = DbContextFactory.Create(DatabaseProvider.PostgreSql);
+            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
 
             var userRepository = new UserRepository(context);
             var categoryRepository = new CategoryRepository(context);
@@ -110,7 +110,7 @@ namespace TaskManager.ViewModel
                     return;
                 }
 
-                using var context = DbContextFactory.Create(DatabaseProvider.PostgreSql);
+                using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
 
                 var category = new Category
                 {
@@ -136,7 +136,7 @@ namespace TaskManager.ViewModel
         {
             try
             {
-                using var context = DbContextFactory.Create(DatabaseProvider.PostgreSql);
+                using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
 
                 var taskRepository = new TaskRepository(context);
                 var taskAssignmentRepository = new TaskAssignmentRepository(context);

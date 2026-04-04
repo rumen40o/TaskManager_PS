@@ -11,6 +11,7 @@ using TaskManagemetCore.Enums;
 using TaskManagementData.Factories;
 using TaskManagementData.Repositories;
 using TaskManager.Commands;
+using TaskManager.View;
 
 namespace TaskManager.ViewModel
 {
@@ -43,7 +44,7 @@ namespace TaskManager.ViewModel
 
         private void Login()
         {
-            var context = DbContextFactory.Create(DatabaseProvider.PostgreSql);
+            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
             var userRepo = new UserRepository(context);
             var authService = new AuthService(userRepo);
 
@@ -74,7 +75,7 @@ namespace TaskManager.ViewModel
 
             foreach (Window window in Application.Current.Windows)
             {
-                if (window is MainWindow)
+                if (window is LoginWindow)
                 {
                     window.Close();
                     break;
