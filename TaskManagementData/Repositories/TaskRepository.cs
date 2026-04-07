@@ -84,5 +84,36 @@ namespace TaskManagementData.Repositories
 
             return result;
         }
+
+        public void Delete(TaskItem task)
+        {
+            _context.Tasks.Remove(task);
+        }
+
+        public void Update(TaskItem task)
+        {
+            _context.Tasks.Update(task);
+        }
+
+        public List<TaskDashboardDto> GetAllForDashboard()
+        {
+            return _context.Tasks
+                .Select(t => new TaskDashboardDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    Priority = t.Priority,
+                    CategoryName = t.Category.Name,
+
+                    Status = string.Join(", ",
+                        _context.TaskAssignments
+                            .Where(a => a.TaskId == t.Id)
+                            .Select(a => a.Status.ToString())
+                            .Distinct()
+                    )
+                })
+                .ToList();
+        }
     }
 }

@@ -57,7 +57,6 @@ namespace TaskManager.ViewModel
 
         private void LoadTasks()
         {
-            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
             var taskRepository = new TaskRepository(context);
 
             var tasks = taskRepository.GetAllForDashboard();
@@ -124,7 +123,6 @@ namespace TaskManager.ViewModel
                 if (result != MessageBoxResult.Yes)
                     return;
 
-                using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
                 var taskRepository = new TaskRepository(context);
 
                 var task = taskRepository.GetById(SelectedTask.Id);

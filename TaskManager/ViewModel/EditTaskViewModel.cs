@@ -72,7 +72,6 @@ namespace TaskManager.ViewModel
 
         private void LoadData()
         {
-            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
 
             var taskRepository = new TaskRepository(context);
             var categoryRepository = new CategoryRepository(context);
@@ -116,7 +115,6 @@ namespace TaskManager.ViewModel
                     return;
                 }
 
-                using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
                 var taskRepository = new TaskRepository(context);
 
                 var task = taskRepository.GetById(_taskId);
