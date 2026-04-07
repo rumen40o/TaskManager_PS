@@ -150,6 +150,7 @@ namespace TaskManager.ViewModel
             if (SelectedTask == null)
                 return;
 
+
             using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
             var commentRepository = new TaskCommentRepository(context);
             var assignmentRepository = new TaskAssignmentRepository(context);
