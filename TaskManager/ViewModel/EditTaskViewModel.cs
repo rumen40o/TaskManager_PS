@@ -1,10 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Internal;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TaskManagementData.Factories;
@@ -23,7 +19,7 @@ namespace TaskManager.ViewModel
         private string _description = string.Empty;
         private Category? _selectedCategory;
         private TaskPriority _selectedPriority;
-        private TaskStatus _selectedStatus;
+        private DateTime? _dueDate;
 
         public string Title
         {
@@ -49,14 +45,13 @@ namespace TaskManager.ViewModel
             set { _selectedPriority = value; OnPropertyChanged(); }
         }
 
-        public TaskStatus SelectedStatus
+        public DateTime? DueDate
         {
-            get => _selectedStatus;
-            set { _selectedStatus = value; OnPropertyChanged(); }
+            get => _dueDate;
+            set { _dueDate = value; OnPropertyChanged(); }
         }
 
         public Array Priorities => Enum.GetValues(typeof(TaskPriority));
-        public Array Statuses => Enum.GetValues(typeof(TaskStatus));
 
         public ObservableCollection<Category> Categories { get; set; } = new();
 
@@ -72,6 +67,7 @@ namespace TaskManager.ViewModel
 
         private void LoadData()
         {
+            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
 
             var taskRepository = new TaskRepository(context);
             var categoryRepository = new CategoryRepository(context);
@@ -83,10 +79,12 @@ namespace TaskManager.ViewModel
                 return;
             }
 
-            // populate fields
             Title = task.Title;
-            Description = task.Description;
+            Description = task.Description ?? string.Empty;
             SelectedPriority = task.Priority;
+            DueDate = task.DueDate.HasValue
+                ? DateTime.SpecifyKind(task.DueDate.Value, DateTimeKind.Utc)
+                : null;
 
             var categories = categoryRepository.GetAll();
 
@@ -115,6 +113,7 @@ namespace TaskManager.ViewModel
                     return;
                 }
 
+                using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
                 var taskRepository = new TaskRepository(context);
 
                 var task = taskRepository.GetById(_taskId);
@@ -124,16 +123,21 @@ namespace TaskManager.ViewModel
                     return;
                 }
 
+                var dueDateUtc = DueDate.HasValue
+                    ? DateTime.SpecifyKind(DueDate.Value.Date, DateTimeKind.Utc)
+                    : (DateTime?)null;
+
                 task.Title = Title;
                 task.Description = Description;
                 task.CategoryId = SelectedCategory.Id;
                 task.Priority = SelectedPriority;
+                task.DueDate = dueDateUtc;
+
                 taskRepository.Update(task);
                 context.SaveChanges();
 
                 MessageBox.Show("Task updated successfully.");
 
-                // Затваряме прозореца успешно
                 var activeWindow = Application.Current.Windows
                     .OfType<Window>()
                     .SingleOrDefault(w => w.IsActive);

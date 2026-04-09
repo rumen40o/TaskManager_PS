@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -15,29 +12,9 @@ using TaskManager.Commands;
 
 namespace TaskManager.ViewModel
 {
-    public class UserDashboardViewModel : BaseViewModel
+    public class UserDashboardViewModel : UserTasksViewModel
     {
-        private UserTaskItemViewModel? _selectedTask;
-        private readonly int _currentUserId;
         private string _newComment = string.Empty;
-        private string _searchText = string.Empty;
-
-        private List<UserTaskItemViewModel> _allTasks = new();
-
-        public ObservableCollection<UserTaskItemViewModel> Tasks { get; set; } = new();
-        public ObservableCollection<TaskCommentDto> Comments { get; set; } = new();
-
-        public UserTaskItemViewModel? SelectedTask
-        {
-            get => _selectedTask;
-            set
-            {
-                _selectedTask = value;
-                OnPropertyChanged();
-                LoadComments();
-                CommandManager.InvalidateRequerySuggested();
-            }
-        }
 
         public string NewComment
         {
@@ -50,32 +27,17 @@ namespace TaskManager.ViewModel
             }
         }
 
-        public string SearchText
-        {
-            get => _searchText;
-            set
-            {
-                _searchText = value;
-                OnPropertyChanged();
-                ApplyFilter();
-            }
-        }
-
         public Array Statuses => Enum.GetValues(typeof(AssignmentStatus));
 
         public ICommand RefreshTasksCommand { get; }
         public ICommand UpdateStatusCommand { get; }
         public ICommand AddCommentCommand { get; }
 
-        public UserDashboardViewModel(int currentUserId)
+        public UserDashboardViewModel(int currentUserId) : base(currentUserId)
         {
-            _currentUserId = currentUserId;
-
             RefreshTasksCommand = new RelayCommand(LoadTasks);
             UpdateStatusCommand = new RelayCommand(UpdateStatus, CanUpdateStatus);
             AddCommentCommand = new RelayCommand(AddComment, CanAddComment);
-
-            LoadTasks();
         }
 
         private bool CanUpdateStatus()
@@ -88,26 +50,82 @@ namespace TaskManager.ViewModel
             return SelectedTask != null && !string.IsNullOrWhiteSpace(NewComment);
         }
 
-        private void LoadTasks()
+        private void AddComment()
         {
-            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
-
-            var assignmentRepository = new TaskAssignmentRepository(context);
-            var assignments = assignmentRepository.GetByUserId(_currentUserId);
-
-            var selectedTaskAssignmentId = SelectedTask?.TaskAssignmentId;
-
-            _allTasks = assignments.Select(assignment => new UserTaskItemViewModel
+            try
             {
-                Tasks.Add(new UserTaskItemViewModel
+                var selectedTask = SelectedTask;
+                var newComment = NewComment?.Trim();
+
+                if (selectedTask == null)
                 {
-                    TaskAssignmentId = assignment.Id,
-                    Title = assignment.Task.Title,
-                    Description = assignment.Task.Description ?? "",
-                    CategoryName = assignment.Task.Category != null ? assignment.Task.Category.Name : "No Category",
-                    Priority = assignment.Task.Priority.ToString(),
-                    SelectedStatus = assignment.Status
-                });
+                    MessageBox.Show("Select a task first.");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(newComment))
+                {
+                    MessageBox.Show("Comment cannot be empty.");
+                    return;
+                }
+
+                using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
+
+                var assignmentRepository = new TaskAssignmentRepository(context);
+                var commentRepository = new TaskCommentRepository(context);
+
+                var assignment = assignmentRepository.GetById(selectedTask.TaskAssignmentId);
+                if (assignment == null)
+                {
+                    MessageBox.Show("Task assignment not found.");
+                    return;
+                }
+
+                var userExists = context.Users.Any(u => u.Id == CurrentUserId);
+                var taskExists = context.Tasks.Any(t => t.Id == assignment.TaskId);
+
+                if (!userExists)
+                {
+                    MessageBox.Show("Current user does not exist in database.");
+                    return;
+                }
+
+                if (!taskExists)
+                {
+                    MessageBox.Show("Selected task does not exist in database.");
+                    return;
+                }
+
+                var comment = new TaskComment
+                {
+                    TaskId = assignment.TaskId,
+                    UserId = CurrentUserId,
+                    Content = newComment,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                commentRepository.Add(comment);
+                context.SaveChanges();
+
+                NewComment = string.Empty;
+                LoadComments();
+
+                MessageBox.Show("Comment added successfully.");
+            }
+            catch (Exception ex)
+            {
+                var sb = new StringBuilder();
+                var current = ex;
+
+                while (current != null)
+                {
+                    sb.AppendLine(current.GetType().FullName);
+                    sb.AppendLine(current.Message);
+                    sb.AppendLine("--------------------------------------------------");
+                    current = current.InnerException;
+                }
+
+                MessageBox.Show(sb.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -135,7 +153,7 @@ namespace TaskManager.ViewModel
                 {
                     TaskAssignmentId = selectedTask.TaskAssignmentId,
                     NewStatus = selectedTask.SelectedStatus,
-                    ChangedByUserId = _currentUserId,
+                    ChangedByUserId = CurrentUserId,
                     Note = "Status updated by user."
                 });
 

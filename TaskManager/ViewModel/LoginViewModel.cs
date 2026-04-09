@@ -15,7 +15,7 @@ using TaskManager.View;
 
 namespace TaskManager.ViewModel
 {
-    public class LoginViewModel : BaseViewModel
+    public class LoginViewModel : AuthViewModel
     {
         private string _username = string.Empty;
         private string _password = string.Empty;
@@ -23,17 +23,24 @@ namespace TaskManager.ViewModel
         public string Username
         {
             get => _username;
-            set { _username = value; OnPropertyChanged(); }
+            set
+            {
+                _username = value;
+                OnPropertyChanged();
+            }
         }
 
         public string Password
         {
             get => _password;
-            set { _password = value; OnPropertyChanged(); }
+            set
+            {
+                _password = value;
+                OnPropertyChanged();
+            }
         }
 
         public ICommand LoginCommand { get; }
-
         public ICommand OpenRegisterCommand { get; }
 
         public LoginViewModel()
@@ -44,15 +51,7 @@ namespace TaskManager.ViewModel
 
         private void Login()
         {
-            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
-            var userRepo = new UserRepository(context);
-            var authService = new AuthService(userRepo);
-
-            var result = authService.Login(new LoginRequest
-            {
-                Username = Username,
-                Password = Password
-            });
+            var result = LoginUser(Username, Password);
 
             if (!result.IsSuccess)
             {
@@ -64,12 +63,12 @@ namespace TaskManager.ViewModel
 
             if (result.User!.Role == UserRole.ADMIN)
             {
-                var adminWindow = new View.AdminDashboard();
+                var adminWindow = new AdminDashboard();
                 adminWindow.Show();
             }
             else
             {
-                var userWindow = new View.UserDashboard(result.User.Id);
+                var userWindow = new UserDashboard(result.User.Id);
                 userWindow.Show();
             }
 
@@ -85,10 +84,17 @@ namespace TaskManager.ViewModel
 
         private void OpenRegister()
         {
-            var registerWindow = new View.RegisterWindow();
+            var registerWindow = new RegisterWindow();
             registerWindow.Show();
 
-            Application.Current.Windows[0]?.Close();
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window is LoginWindow)
+                {
+                    window.Close();
+                    break;
+                }
+            }
         }
     }
 }

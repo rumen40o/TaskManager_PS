@@ -1,0 +1,59 @@
+﻿<Window x:Class="TaskManager.View.AdminUsersView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Users"
+        Height="500"
+        Width="700">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- FILTERS -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="Username"/>
+                <TextBox Width="150" Text="{Binding SearchUsername}"/>
+            </StackPanel>
+
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="Email"/>
+                <TextBox Width="150" Text="{Binding SearchEmail}"/>
+            </StackPanel>
+
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="Role"/>
+                <ComboBox Width="120"
+                          ItemsSource="{Binding Roles}"
+                          SelectedItem="{Binding SearchRole}"/>
+            </StackPanel>
+
+            <Button Content="Search"
+                    Width="100"
+                    Command="{Binding SearchUsersCommand}"/>
+
+            <Button Content="Clear"
+        Width="100"
+        Margin="10,0,0,0"
+        Command="{Binding ClearFiltersCommand}"/>
+        </StackPanel>
+        
+
+        <!-- TABLE -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Users}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Username" Binding="{Binding Username}"/>
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}"/>
+                <DataGridTextColumn Header="Role" Binding="{Binding Role}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

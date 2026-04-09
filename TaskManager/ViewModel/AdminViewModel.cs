@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using TaskManagementData.Factories;
+using TaskManagementData.Repositories;
 using TaskManagemetCore.DTOs;
 using TaskManagemetCore.Enums;
 using TaskManagemetCore.Models;
 using TaskManagemetCore.Services;
-using TaskManagementData.Factories;
-using TaskManagementData.Repositories;
 using TaskManager.Commands;
 
 namespace TaskManager.ViewModel
@@ -20,6 +21,7 @@ namespace TaskManager.ViewModel
         private string _newCategoryName = string.Empty;
         private Category? _selectedCategory;
         private TaskPriority _selectedPriority;
+        private DateTime? _dueDate;
 
         public string Title
         {
@@ -49,6 +51,16 @@ namespace TaskManager.ViewModel
         {
             get => _selectedPriority;
             set { _selectedPriority = value; OnPropertyChanged(); }
+        }
+
+        public DateTime? DueDate
+        {
+            get => _dueDate;
+            set
+            {
+                _dueDate = value;
+                OnPropertyChanged();
+            }
         }
 
         public Array Priorities => Enum.GetValues(typeof(TaskPriority));
@@ -100,6 +112,20 @@ namespace TaskManager.ViewModel
             }
         }
 
+        private void LoadCategoriesOnly()
+        {
+            using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
+
+            var categoryRepository = new CategoryRepository(context);
+            var categories = categoryRepository.GetAll();
+
+            Categories.Clear();
+            foreach (var category in categories)
+            {
+                Categories.Add(category);
+            }
+        }
+
         private void AddCategory()
         {
             try
@@ -112,16 +138,24 @@ namespace TaskManager.ViewModel
 
                 using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
 
+                var exists = context.Categories.Any(c => c.Name == NewCategoryName.Trim());
+                if (exists)
+                {
+                    MessageBox.Show("Category already exists.");
+                    return;
+                }
+
                 var category = new Category
                 {
-                    Name = NewCategoryName,
+                    Name = NewCategoryName.Trim(),
                     Description = string.Empty
                 };
 
                 context.Categories.Add(category);
                 context.SaveChanges();
 
-                Categories.Add(category);
+                LoadCategoriesOnly();
+
                 NewCategoryName = string.Empty;
 
                 MessageBox.Show("Category added successfully.");
@@ -136,6 +170,12 @@ namespace TaskManager.ViewModel
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(Title))
+                {
+                    MessageBox.Show("Title is required.");
+                    return;
+                }
+
                 using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
 
                 var taskRepository = new TaskRepository(context);
@@ -148,6 +188,10 @@ namespace TaskManager.ViewModel
                     .Select(u => u.Id)
                     .ToList();
 
+                var dueDateUtc = DueDate.HasValue
+                    ? DateTime.SpecifyKind(DueDate.Value, DateTimeKind.Utc)
+                        : (DateTime?)null;
+
                 taskService.CreateTask(new CreateTaskRequest
                 {
                     Title = Title,
@@ -155,7 +199,8 @@ namespace TaskManager.ViewModel
                     CategoryId = SelectedCategory?.Id,
                     AssignedUserIds = selectedUserIds,
                     CreatedByUserId = 1,
-                    Priority = SelectedPriority
+                    Priority = SelectedPriority,
+                    DueDate = dueDateUtc
                 });
 
                 MessageBox.Show("Task created successfully.");
@@ -164,6 +209,7 @@ namespace TaskManager.ViewModel
                 Description = string.Empty;
                 SelectedCategory = null;
                 SelectedPriority = TaskPriority.MEDIUM;
+                DueDate = null;
 
                 foreach (var user in Users)
                 {
@@ -172,7 +218,18 @@ namespace TaskManager.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                var sb = new StringBuilder();
+                var current = ex;
+
+                while (current != null)
+                {
+                    sb.AppendLine(current.GetType().FullName);
+                    sb.AppendLine(current.Message);
+                    sb.AppendLine("-----------------------------------");
+                    current = current.InnerException;
+                }
+
+                MessageBox.Show(sb.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TaskManagementData\TaskManagementData.csproj" />
     <ProjectReference Include="..\TaskManagemetCore\TaskManagemetCore.csproj" />
+    <ProjectReference Include="..\TaskManager\TaskManager.csproj" />
   </ItemGroup>
 
 </Project>

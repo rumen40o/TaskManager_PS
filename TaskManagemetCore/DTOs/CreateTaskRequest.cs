@@ -20,5 +20,7 @@ namespace TaskManagemetCore.DTOs
         public int CreatedByUserId { get; set; }
 
         public TaskPriority Priority { get; set; }
+
+        public DateTime? DueDate { get; set; }
     }
 }

@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagementData.Contexts;
 using TaskManagemetCore.DTOs;
 using TaskManagemetCore.Interfaces;
@@ -54,64 +49,91 @@ namespace TaskManagementData.Repositories
 
         public List<TaskDashboardDto> GetAllForDashboard()
         {
-            var tasks = _context.Tasks
-                .Include(t => t.Category)
-                .ToList();
-
-            var assignments = _context.TaskAssignments
-                .ToList();
-
-            var result = tasks.Select(t =>
-            {
-                var statuses = assignments
-                    .Where(a => a.TaskId == t.Id)
-                    .Select(a => a.Status.ToString())
-                    .Distinct()
-                    .ToList();
-
-                return new TaskDashboardDto
-                {
-                    Id = t.Id,
-                    Title = t.Title,
-                    Description = t.Description ?? string.Empty,
-                    Priority = t.Priority,
-                    CategoryName = t.Category != null ? t.Category.Name : "No Category",
-                    Status = statuses.Count == 0
-                        ? "No status"
-                        : string.Join(", ", statuses)
-                };
-            }).ToList();
-
-            return result;
-        }
-
-        public void Delete(TaskItem task)
-        {
-            _context.Tasks.Remove(task);
-        }
-
-        public void Update(TaskItem task)
-        {
-            _context.Tasks.Update(task);
-        }
-
-        public List<TaskDashboardDto> GetAllForDashboard()
-        {
             return _context.Tasks
+                .Include(t => t.Category)
+                .Include(t => t.CreatedByUser)
+                .Include(t => t.TaskAssignments)
                 .Select(t => new TaskDashboardDto
                 {
                     Id = t.Id,
                     Title = t.Title,
-                    Description = t.Description,
+                    Description = t.Description ?? "",
                     Priority = t.Priority,
-                    CategoryName = t.Category.Name,
+                    CategoryName = t.Category != null ? t.Category.Name : "No Category",
+                    Status = t.TaskAssignments.Any()
+                        ? t.TaskAssignments.Select(a => a.Status.ToString()).FirstOrDefault() ?? "No Status"
+                        : "No Status",
+                    DueDate = t.DueDate,
+                    CreatedAt = t.CreatedAt,
+                    CreatedByUsername = t.CreatedByUser != null ? t.CreatedByUser.Username : ""
+                })
+                .ToList();
+        }
 
-                    Status = string.Join(", ",
-                        _context.TaskAssignments
-                            .Where(a => a.TaskId == t.Id)
+        public List<TaskDashboardDto> SearchForDashboard(TaskSearchFilterDto filter)
+        {
+            var query = _context.Tasks
+                .Include(t => t.Category)
+                .Include(t => t.CreatedByUser)
+                .Include(t => t.TaskAssignments)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.Title))
+            {
+                query = query.Where(t => t.Title.Contains(filter.Title));
+            }
+
+            if (filter.DueDate.HasValue)
+            {
+                var start = DateTime.SpecifyKind(filter.DueDate.Value.Date, DateTimeKind.Utc);
+                var end = start.AddDays(1);
+
+                query = query.Where(t =>
+                    t.DueDate.HasValue &&
+                    t.DueDate.Value >= start &&
+                    t.DueDate.Value < end);
+            }
+
+            if (filter.Priority.HasValue)
+            {
+                query = query.Where(t => t.Priority == filter.Priority.Value);
+            }
+
+            if (filter.CreatedAt.HasValue)
+            {
+                var start = DateTime.SpecifyKind(filter.CreatedAt.Value.Date, DateTimeKind.Utc);
+                var end = start.AddDays(1);
+
+                query = query.Where(t => t.CreatedAt >= start && t.CreatedAt < end);
+            }
+
+            if (filter.CreatedByUserId.HasValue)
+            {
+                query = query.Where(t => t.CreatedByUserId == filter.CreatedByUserId.Value);
+            }
+
+            if (filter.CategoryId.HasValue)
+            {
+                query = query.Where(t => t.CategoryId == filter.CategoryId.Value);
+            }
+
+            return query
+                .Select(t => new TaskDashboardDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description ?? "",
+                    Priority = t.Priority,
+                    CategoryName = t.Category != null ? t.Category.Name : "No Category",
+                    DueDate = t.DueDate,
+                    CreatedAt = t.CreatedAt,
+                    CreatedByUsername = t.CreatedByUser != null ? t.CreatedByUser.Username : "",
+                    Status = t.TaskAssignments.Any()
+                        ? t.TaskAssignments
+                            .OrderByDescending(a => a.UpdatedAt)
                             .Select(a => a.Status.ToString())
-                            .Distinct()
-                    )
+                            .FirstOrDefault() ?? "No Status"
+                        : "No Status"
                 })
                 .ToList();
         }

@@ -38,6 +38,10 @@ namespace TaskManagemetCore.Services
                 throw new Exception("At least one user must be selected.");
             }
 
+            var dueDateUtc = request.DueDate.HasValue
+                ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc)
+                : (DateTime?)null;
+
             var task = new TaskItem
             {
                 Title = request.Title,
@@ -45,7 +49,8 @@ namespace TaskManagemetCore.Services
                 CategoryId = request.CategoryId,
                 CreatedByUserId = request.CreatedByUserId,
                 CreatedAt = DateTime.UtcNow,
-                Priority = TaskPriority.MEDIUM
+                Priority = request.Priority,
+                DueDate = dueDateUtc
             };
 
             _taskRepository.Add(task);
