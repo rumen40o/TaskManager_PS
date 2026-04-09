@@ -123,6 +123,7 @@ namespace TaskManager.ViewModel
                 if (result != MessageBoxResult.Yes)
                     return;
 
+                using var context = DbContextFactory.Create(AppSession.CurrentDatabaseProvider);
                 var taskRepository = new TaskRepository(context);
 
                 var task = taskRepository.GetById(SelectedTask.Id);
