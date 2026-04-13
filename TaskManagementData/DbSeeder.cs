@@ -13,7 +13,7 @@ namespace TaskManagementData
     {
         public static void Seed(AppDbContext context)
         {
-            // ако вече има admin → нищо не правим
+            
             if (context.Users.Any(u => u.Role == UserRole.ADMIN))
                 return;
 

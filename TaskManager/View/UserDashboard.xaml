@@ -13,7 +13,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT SIDE -->
+        
         <Grid Grid.Column="0" Margin="0,0,15,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -21,7 +21,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- SEARCH -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="Search:"
                            VerticalAlignment="Center"
@@ -30,7 +29,6 @@
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
-            <!-- TASK TABLE -->
             <DataGrid Grid.Row="1"
                       ItemsSource="{Binding Tasks}"
                       SelectedItem="{Binding SelectedTask}"
@@ -60,7 +58,6 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <!-- ACTION BUTTONS -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="Refresh"
                         Command="{Binding RefreshTasksCommand}"
@@ -73,7 +70,6 @@
             </StackPanel>
         </Grid>
 
-        <!-- RIGHT SIDE COMMENTS -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
