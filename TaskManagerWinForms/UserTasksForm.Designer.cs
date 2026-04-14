@@ -32,40 +32,47 @@
         private System.Windows.Forms.TextBox txtSearch;
         private void InitializeComponent()
         {
-            this.dgvTasks = new System.Windows.Forms.DataGridView();
-            this.btnRefresh = new System.Windows.Forms.Button();
-            this.txtSearch = new System.Windows.Forms.TextBox();
-
-            ((System.ComponentModel.ISupportInitialize)(this.dgvTasks)).BeginInit();
-            this.SuspendLayout();
-
-
-            this.txtSearch.Location = new System.Drawing.Point(12, 12);
-            this.txtSearch.Size = new System.Drawing.Size(300, 23);
-            this.txtSearch.Name = "txtSearch";
-
-
-            this.dgvTasks.Location = new System.Drawing.Point(12, 50);
-            this.dgvTasks.Size = new System.Drawing.Size(760, 320);
-            this.dgvTasks.Name = "dgvTasks";
-            this.dgvTasks.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-
-
-            this.btnRefresh.Location = new System.Drawing.Point(660, 380);
-            this.btnRefresh.Size = new System.Drawing.Size(112, 30);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Text = "Refresh";
-            this.btnRefresh.UseVisualStyleBackColor = true;
-
-            this.ClientSize = new System.Drawing.Size(800, 420);
-            this.Controls.Add(this.dgvTasks);
-            this.Controls.Add(this.btnRefresh);
-            this.Controls.Add(this.txtSearch);
-            this.Text = "User Tasks";
-
-            ((System.ComponentModel.ISupportInitialize)(this.dgvTasks)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            dgvTasks = new DataGridView();
+            btnRefresh = new Button();
+            txtSearch = new TextBox();
+            ((System.ComponentModel.ISupportInitialize)dgvTasks).BeginInit();
+            SuspendLayout();
+            // 
+            // dgvTasks
+            // 
+            dgvTasks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvTasks.Location = new Point(12, 50);
+            dgvTasks.Name = "dgvTasks";
+            dgvTasks.Size = new Size(760, 320);
+            dgvTasks.TabIndex = 0;
+            // 
+            // btnRefresh
+            // 
+            btnRefresh.Location = new Point(660, 380);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new Size(112, 30);
+            btnRefresh.TabIndex = 1;
+            btnRefresh.Text = "Refresh";
+            btnRefresh.UseVisualStyleBackColor = true;
+            // 
+            // txtSearch
+            // 
+            txtSearch.Location = new Point(12, 12);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(300, 23);
+            txtSearch.TabIndex = 2;
+            // 
+            // UserTasksForm
+            // 
+            ClientSize = new Size(800, 420);
+            Controls.Add(dgvTasks);
+            Controls.Add(btnRefresh);
+            Controls.Add(txtSearch);
+            Name = "UserTasksForm";
+            Text = "User Tasks";
+            ((System.ComponentModel.ISupportInitialize)dgvTasks).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

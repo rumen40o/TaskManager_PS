@@ -10,7 +10,7 @@ using TaskManagemetCore.Enums;
 
 namespace TaskManagementData.Factories
 {
-    public static class DbContextFactory 
+    public static class DbContextFactory
     {
         public static AppDbContext Create(DatabaseProvider provider)
         {
@@ -19,7 +19,11 @@ namespace TaskManagementData.Factories
             switch (provider)
             {
                 case DatabaseProvider.Sqlite:
-                    builder.UseSqlite("Data Source=taskmanager.db");
+                    var dbPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                        "taskmanager.db");
+
+                    builder.UseSqlite($"Data Source={dbPath}");
                     break;
 
                 case DatabaseProvider.PostgreSql:
@@ -35,7 +39,6 @@ namespace TaskManagementData.Factories
 
             DbSeeder.Seed(context);
             return context;
-
         }
     }
 }
